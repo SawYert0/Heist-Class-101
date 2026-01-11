@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lockwood Command Terminal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dark sidebar-collapsed">
+
+<div class="page-wrapper">
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <h1>Heist Class 101 – Character Planner</h1>
+
+    <!-- THEME DROPDOWN -->
+    <div class="theme-box">
+      <label for="themeSelector">Appearance</label><br>
+      <select id="themeSelector" name="themeSelector">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="gray">Gray</option>
+        <option value="blue">Blue</option>
+      </select>
+    </div>
+
+    <h2>Lockwood Academy Staff & Students</h2>
+
+    <div style="text-align:center;">
+      <button id="addCharacterBtn">+ New Character</button>
+    </div>
+
+    <!-- CHARACTER GRID -->
+    <div class="grid" id="characterGrid">
+      <div class="card">
+        <img src="images/CainAbsten.png" alt="Cain Absten" onclick="openLightbox(this.src)">
+        <div class="name">Cain Absten</div>
+        <div class="alias">Alias: Cipher</div>
+        <div class="role">Role: Strategist</div>
+        <textarea>Mastermind behind Lockwood’s tactical operations.</textarea>
+        <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+      </div>
+
+      <div class="card">
+        <img src="images/HE.png" alt="HE" onclick="openLightbox(this.src)">
+        <div class="name">HE</div>
+        <div class="alias">Alias: Echo</div>
+        <div class="role">Role: Recon</div>
+        <textarea>Silent observer with unmatched stealth and awareness.</textarea>
+        <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+      </div>
+
+      <div class="card">
+        <img src="images/JaysonHunter.png" alt="Jayson Hunter" onclick="openLightbox(this.src)">
+        <div class="name">Jayson Hunter</div>
+        <div class="alias">Alias: Blaze</div>
+        <div class="role">Role: Field Agent</div>
+        <textarea>High-intensity operative built for rapid response missions.</textarea>
+        <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+      </div>
+
+      <div class="card">
+        <img src="images/Silaskade.png" alt="Silas Kade" onclick="openLightbox(this.src)">
+        <div class="name">Silas Kade</div>
+        <div class="alias">Alias: Phantom</div>
+        <div class="role">Role: Infiltrator</div>
+        <textarea>Specialist in covert entry and quiet extraction.</textarea>
+        <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+      </div>
+    </div>
+
+    <h2>Lockwood Academy Schedules</h2>
+
+    <!-- SCHEDULE GRID -->
+    <div class="grid" id="scheduleGrid">
+      <div class="card">
+        <img src="images/weekday.png" alt="Weekday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Weekday Schedule</div>
+      </div>
+
+      <div class="card">
+        <img src="images/saturday.png" alt="Saturday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Saturday Schedule</div>
+      </div>
+
+      <div class="card">
+        <img src="images/sunday.png" alt="Sunday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Sunday Schedule</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR TOGGLE -->
+  <div class="sidebar-toggle" id="sidebarToggle">Files</div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar-wrapper">
+    <div class="sidebar">
+      <h3>Maps & Files</h3>
+      <small>Operational visuals, blueprints, mission files</small>
+
+      <div class="sidebar-files" id="fileList"></div>
+
+      <button id="addFileBtn">+ Add File</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" alt="Expanded view">
+</div>
+
+<!-- CHARACTER POPUP -->
+<div id="popupCharacter" class="popup-panel">
+  <h3>NEW CHARACTER AUTHORIZATION</h3>
+
+  <input id="charName" placeholder="Character Name">
+  <input id="charAlias" placeholder="Alias">
+  <input id="charRole" placeholder="Role">
+  <input id="charImage" placeholder="Image path (e.g., images/CainAbsten.png)">
+  <textarea id="charNotes" placeholder="Notes..."></textarea>
+
+  <div class="popup-buttons">
+    <button class="popup-cancel" id="cancelCharBtn">Cancel</button>
+    <button class="popup-submit" id="submitCharBtn">Authorize</button>
+  </div>
+</div>
+
+<!-- FILE POPUP -->
+<div id="popupFile" class="popup-panel">
+  <h3>NEW FILE AUTHORIZATION</h3>
+
+  <input id="fileTitle" placeholder="File Title">
+  <input id="fileImage" placeholder="Image path (e.g., images/map1.png)">
+  <textarea id="fileNotes" placeholder="Optional notes..."></textarea>
+
+  <div class="popup-buttons">
+    <button class="popup-cancel" id="cancelFileBtn">Cancel</button>
+    <button class="popup-submit" id="submitFileBtn">Authorize</button>
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+/* THEME SWITCHER */
+const themeSelector = document.getElementById("themeSelector");
+themeSelector.addEventListener("change", () => {
+  const theme = themeSelector.value || "dark";
+  const sidebarState = document.body.classList.contains("sidebar-expanded")
+    ? "sidebar-expanded"
+    : "sidebar-collapsed";
+  document.body.className = theme + " " + sidebarState;
+});
+
+/* LIGHTBOX */
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").style.display = "flex";
+}
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+}
+
+/* DELETE CARD */
+function revokeCard(button) {
+  const card = button.closest(".card, .file-card");
+  if (card) {
+    card.remove();
+    saveState();
+  }
+}
+
+/* POPUP REFERENCES */
+const popupCharacter = document.getElementById("popupCharacter");
+const popupFile      = document.getElementById("popupFile");
+
+const addCharacterBtn = document.getElementById("addCharacterBtn");
+const cancelCharBtn   = document.getElementById("cancelCharBtn");
+const submitCharBtn   = document.getElementById("submitCharBtn");
+
+const addFileBtn    = document.getElementById("addFileBtn");
+const cancelFileBtn = document.getElementById("cancelFileBtn");
+const submitFileBtn = document.getElementById("submitFileBtn");
+
+/* CHARACTER POPUP */
+addCharacterBtn.onclick = () => popupCharacter.style.display = "block";
+cancelCharBtn.onclick   = () => popupCharacter.style.display = "none";
+
+/* FILE POPUP */
+addFileBtn.onclick = () => popupFile.style.display = "block";
+cancelFileBtn.onclick = () => popupFile.style.display = "none";
+
+/* SAVE STATE */
+function saveState() {
+  const characters = [];
+  const files = [];
+
+  document.querySelectorAll("#characterGrid .card").forEach(card => {
+    characters.push({
+      img: card.querySelector("img")?.src || "",
+      name: card.querySelector(".name")?.textContent || "",
+      alias: card.querySelector(".alias")?.textContent || "",
+      role: card.querySelector(".role")?.textContent || "",
+      notes: card.querySelector("textarea")?.value || ""
+    });
+  });
+
+  document.querySelectorAll("#fileList .file-card").forEach(fc => {
+    files.push({
+      img: fc.querySelector("img")?.src || "",
+      title: fc.querySelector(".file-title")?.textContent || ""
+    });
+  });
+
+  localStorage.setItem("lockwood_terminal_save", JSON.stringify({ characters, files }));
+}
+
+/* LOAD STATE */
+function loadState() {
+  const raw = localStorage.getItem("lockwood_terminal_save");
+  if (!raw) return;
+
+  let state;
+  try { state = JSON.parse(raw); } catch { return; }
+
+  const grid = document.getElementById("characterGrid");
+  const fileList = document.getElementById("fileList");
+
+  (state.characters || []).forEach(c => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${c.img}" alt="${c.name}" onclick="openLightbox(this.src)">
+      <div class="name">${c.name}</div>
+      <div class="alias">${c.alias}</div>
+      <div class="role">${c.role}</div>
+      <textarea>${c.notes || ""}</textarea>
+      <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+    `;
+    grid.appendChild(card);
+  });
+
+  fileList.innerHTML = "";
+  (state.files || []).forEach(f => {
+    const fc = document.createElement("div");
+    fc.className = "file-card";
+    fc.innerHTML = `
+      <img src="${f.img}" alt="${f.title}" onclick="openLightbox(this.src)">
+      <div class="file-title">${f.title}</div>
+      <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+    `;
+    fileList.appendChild(fc);
+  });
+}
+
+/* SUBMIT CHARACTER */
+submitCharBtn.onclick = () => {
+  const name  = document.getElementById("charName").value  || "New Character";
+  const alias = document.getElementById("charAlias").value || "(alias)";
+  const role  = document.getElementById("charRole").value  || "Role";
+  const img   = document.getElementById("charImage").value || "";
+  const notes = document.getElementById("charNotes").value || "";
+
+  const grid = document.getElementById("characterGrid");
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <img src="${img}" alt="${name}" onclick="openLightbox(this.src)">
+    <div class="name">${name}</div>
+    <div class="alias">${alias}</div>
+    <div class="role">${role}</div>
+    <textarea>${notes}</textarea>
+    <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+  `;
+  grid.appendChild(card);
+
+  popupCharacter.style.display = "none";
+  saveState();
+};
+
+/* SUBMIT FILE */
+submitFileBtn.onclick = () => {
+  const title   = document.getElementById("fileTitle").value || "New File";
+  const imgPath = document.getElementById("fileImage").value || "";
+
+  const fileList = document.getElementById("fileList");
+  const fc = document.createElement("div");
+  fc.className = "file-card";
+  fc.innerHTML = `
+    <img src="${imgPath}" alt="${title}" onclick="openLightbox(this.src)">
+    <div class="file-title">${title}</div>
+    <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+  `;
+  fileList.appendChild(fc);
+
+  popupFile.style.display = "none";
+  saveState();
+};
+
+/* SIDEBAR TOGGLE */
+const sidebarToggle = document.getElementById("sidebarToggle");
+sidebarToggle.onclick = () => {
+  const expanded = document.body.classList.contains("sidebar-expanded");
+  const theme = themeSelector.value || "dark";
+
+  document.body.classList.remove("sidebar-expanded", "sidebar-collapsed");
+  document.body.classList.add(expanded ? "sidebar-collapsed" : "sidebar-expanded");
+
+  const sidebarState = expanded ? "sidebar-collapsed" : "sidebar-expanded";
+  document.body.className = theme + " " + sidebarState;
+};
+
+/* INITIALIZE */
+window.addEventListener("load", () => {
+  document.body.className = "dark sidebar-collapsed";
+  themeSelector.value = "dark";
+  loadState();
+});
+</script>
+
+</body>
+</html>
