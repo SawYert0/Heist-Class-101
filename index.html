@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heist Class 101 – Character Planner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dark sidebar-collapsed">
+
+<!-- LOCKWOOD ACADEMY LOGIN SCREEN -->
+<div id="lockwoodLogin" class="login-screen">
+  <div class="login-panel">
+    <h1 class="login-title">LOCKWOOD ACADEMY</h1>
+    <h2 class="login-subtitle">SECURE ACCESS PORTAL</h2>
+
+    <input id="loginUser" type="text" placeholder="Username">
+    <input id="loginPass" type="password" placeholder="Password">
+
+    <button id="loginBtn">Sign In</button>
+    <button id="guestBtn" class="guest-btn">Continue as Guest</button>
+
+    <p class="login-hint">Unauthorized access is prohibited</p>
+  </div>
+</div>
+
+<!-- NOISE OVERLAY -->
+<div class="noise-overlay"></div>
+
+<!-- APP CONTAINER -->
+<div class="app-container">
+
+  <!-- 3D ROTATING LOCKWOOD EMBLEM (medium size; styled in CSS) -->
+  <div class="lockwood-emblem-container">
+    <div class="lockwood-emblem">
+      <div class="ring"></div>
+      <div class="inner-circle"></div>
+      <div class="lockwood-text">LOCKWOOD</div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <div class="header-left">
+      <h1>Heist Class 101 – Character Planner</h1>
+
+      <div class="search-box">
+        <input id="searchCharacters" type="text" placeholder="Search characters by name, alias, or role">
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="codename-box">
+        <label for="codenameOutput">Codename</label>
+        <div class="codename-row">
+          <input id="codenameOutput" type="text" readonly>
+          <button id="generateCodenameBtn">Generate</button>
+        </div>
+      </div>
+
+      <div class="theme-box">
+        <label for="themeSelector">Appearance</label><br>
+        <select id="themeSelector">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="gray">Gray</option>
+          <option value="blue">Blue</option>
+        </select>
+      </div>
+
+      <!-- OPS CENTER BUTTON (ADMIN ONLY) -->
+      <div class="ops-center-button-wrapper">
+        <button
+          id="opsCenterBtn"
+          class="ops-center-btn"
+          title="Admin clearance required"
+          disabled
+        >
+          OPS CENTER
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <h2>Lockwood Academy Staff & Students</h2>
+
+    <div style="text-align:center;">
+      <button id="addCharacterBtn">+ New Character</button>
+    </div>
+
+    <!-- CHARACTER GRID -->
+    <div class="grid" id="characterGrid"></div>
+
+    <h2>Lockwood Academy Schedules</h2>
+
+    <!-- SCHEDULE GRID -->
+    <div class="grid" id="scheduleGrid">
+      <div class="card schedule-card">
+        <img src="images/weekday.png" alt="Weekday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Weekday Schedule</div>
+      </div>
+
+      <div class="card schedule-card">
+        <img src="images/saturday.png" alt="Saturday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Saturday Schedule</div>
+      </div>
+
+      <div class="card schedule-card">
+        <img src="images/sunday.png" alt="Sunday Schedule" onclick="openLightbox(this.src)">
+        <div class="name">Sunday Schedule</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR TOGGLE -->
+  <div class="sidebar-toggle" id="sidebarToggle">Files</div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar-wrapper">
+    <div class="sidebar">
+      <h3><span class="icon">📁</span> Maps & Files</h3>
+      <small>Operational visuals, blueprints, mission files</small>
+
+      <div class="sidebar-files" id="fileList"></div>
+
+      <button id="addFileBtn">+ Add File</button>
+    </div>
+  </aside>
+
+</div> <!-- END OF APP CONTAINER -->
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" alt="Expanded view">
+</div>
+
+<!-- MISSION VIEWER -->
+<div id="missionViewer" class="mission-viewer">
+  <div class="mission-content">
+    <button class="mission-close" onclick="closeMissionViewer()">✕</button>
+    <h2 id="missionTitle"></h2>
+    <img id="missionImage" alt="Mission File">
+    <p id="missionNotes"></p>
+  </div>
+</div>
+
+<!-- CHARACTER POPUP -->
+<div id="popupCharacter" class="popup-panel">
+  <h3>NEW CHARACTER AUTHORIZATION</h3>
+
+  <input id="charName" placeholder="Character Name">
+  <input id="charAlias" placeholder="Alias">
+  <input id="charRole" placeholder="Role">
+  <input id="charImage" placeholder="Image path (optional)">
+  <input type="file" id="charUpload" accept="image/*">
+  <textarea id="charNotes" placeholder="Notes..."></textarea>
+
+  <div class="popup-buttons">
+    <button class="popup-cancel" id="cancelCharBtn">Cancel</button>
+    <button class="popup-submit" id="submitCharBtn">Authorize</button>
+  </div>
+</div>
+
+<!-- EDIT CHARACTER POPUP -->
+<div id="editCharacterPopup" class="popup-panel">
+  <h3>EDIT CHARACTER</h3>
+
+  <input id="editCharName" placeholder="Character Name">
+  <input id="editCharAlias" placeholder="Alias">
+  <input id="editCharRole" placeholder="Role">
+  <input id="editCharImage" placeholder="Image path (optional)">
+  <input type="file" id="editCharUpload" accept="image/*">
+  <textarea id="editCharNotes" placeholder="Notes..."></textarea>
+
+  <div class="popup-buttons">
+    <button class="popup-cancel" id="cancelEditCharBtn">Cancel</button>
+    <button class="popup-submit" id="saveEditCharBtn">Save Changes</button>
+  </div>
+</div>
+
+<!-- FILE POPUP -->
+<div id="popupFile" class="popup-panel">
+  <h3>NEW FILE AUTHORIZATION</h3>
+
+  <input id="fileTitle" placeholder="File Title">
+  <input id="fileImage" placeholder="Image path (optional)">
+  <input type="file" id="fileUpload" accept="image/*">
+  <textarea id="fileNotes" placeholder="Optional notes..."></textarea>
+
+  <div class="popup-buttons">
+    <button class="popup-cancel" id="cancelFileBtn">Cancel</button>
+    <button class="popup-submit" id="submitFileBtn">Authorize</button>
+  </div>
+</div>
+
+<!-- SPY MUSIC CONTROLS (bottom-left) -->
+<div class="music-controls">
+  <button id="musicToggle">🔊 Music</button>
+  <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.4">
+</div>
+
+<audio id="spyMusic" loop>
+  <source src="music/spy-theme.mp3" type="audio/mpeg">
+</audio>
+
+<!-- INTEL TICKER (bottom) -->
+<div class="intel-ticker" id="intelTicker">
+  <span id="intelText">Initializing Lockwood Intelligence Feed...</span>
+</div>
+
+<!-- OPS CENTER FADE OVERLAY -->
+<div id="opsFadeOverlay" class="ops-fade-overlay"></div>
+
+<!-- OPS CENTER DASHBOARD -->
+<div id="opsCenter" class="ops-center">
+  <div class="ops-center-inner">
+    <!-- TOP BAR -->
+    <div class="ops-top-bar">
+      <div class="ops-top-left">
+        <span class="ops-badge">LOCKWOOD OPS CENTER</span>
+        <span class="ops-mode-indicator">MODE: ACTIVE</span>
+      </div>
+      <div class="ops-top-right">
+        <button id="closeOpsCenterBtn" class="ops-close-btn">Return to Planner</button>
+      </div>
+    </div>
+
+    <div class="ops-layout">
+      <!-- LEFT COLUMN: NOTES PANEL -->
+      <section class="ops-column ops-notes-column">
+        <h2 class="ops-section-title">Intelligence Notes</h2>
+
+        <div class="ops-notes-tabs">
+          <button class="ops-notes-tab active" data-tab="general">General</button>
+          <button class="ops-notes-tab" data-tab="missions">Missions</button>
+          <button class="ops-notes-tab" data-tab="ideas">Ideas</button>
+        </div>
+
+        <div class="ops-notes-toolbar">
+          <label class="secure-toggle">
+            <input type="checkbox" id="opsSecureToggle">
+            <span>Secure mode (blur notes)</span>
+          </label>
+          <span class="ops-notes-timestamp">Last updated: <span id="opsNotesTimestamp">—</span></span>
+        </div>
+
+        <textarea id="opsNotes" class="ops-notes-area" placeholder="Type operational notes here..."></textarea>
+
+        <button id="opsCopyNotesBtn" class="ops-copy-btn">Copy Notes to Clipboard</button>
+      </section>
+
+      <!-- CENTER COLUMN: EMBLEM + BRIEFING + MAP -->
+      <section class="ops-column ops-center-column">
+        <div class="ops-emblem-wrapper">
+          <div class="lockwood-emblem ops-emblem">
+            <div class="ring"></div>
+            <div class="inner-circle"></div>
+            <div class="lockwood-text">LOCKWOOD</div>
+          </div>
+        </div>
+
+        <div class="ops-briefing-card">
+          <h2 class="ops-section-title">Daily Briefing</h2>
+          <div id="opsBriefingText" class="ops-briefing-body">
+            Compiling daily academy briefing...
+          </div>
+        </div>
+
+        <div class="ops-map-card">
+          <h2 class="ops-section-title">Academy Map</h2>
+          <div class="ops-map-placeholder">
+            <div class="ops-map-grid">
+              <div class="zone zone-a">Zone A</div>
+              <div class="zone zone-b">Zone B</div>
+              <div class="zone zone-c">Zone C</div>
+              <div class="zone zone-d">Zone D</div>
+            </div>
+            <div class="ops-map-legend">
+              <span class="dot active"></span> Active  
+              <span class="dot secure"></span> Secure  
+              <span class="dot restricted"></span> Restricted
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: INTEL FEED + STATUS + MISSIONS + QUICK ACTIONS -->
+      <section class="ops-column ops-right-column">
+        <div class="ops-intel-card">
+          <h2 class="ops-section-title">Live Intel Feed</h2>
+          <ul id="opsIntelFeed" class="ops-intel-list">
+            <!-- JS-populated -->
+          </ul>
+        </div>
+
+        <div class="ops-status-card">
+          <h2 class="ops-section-title">System Status</h2>
+          <div class="ops-status-grid">
+            <div class="status-item">
+              <span class="label">ENCRYPTION</span>
+              <span class="value ok">ONLINE</span>
+            </div>
+            <div class="status-item">
+              <span class="label">NETWORK</span>
+              <span class="value ok">SECURE</span>
+            </div>
+            <div class="status-item">
+              <span class="label">UPLINK</span>
+              <span class="value warn">STABLE</span>
+            </div>
+            <div class="status-item">
+              <span class="label">TERMINAL</span>
+              <span class="value ok">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ops-mission-card">
+          <h2 class="ops-section-title">Mission Snapshot</h2>
+          <ul id="opsMissionSnapshot" class="ops-mission-list">
+            <!-- JS-populated from files -->
+          </ul>
+        </div>
+
+        <div class="ops-quick-actions">
+          <h2 class="ops-section-title">Quick Actions</h2>
+          <div class="ops-quick-grid">
+            <button id="opsQuickAddCharacter">+ New Character</button>
+            <button id="opsQuickAddFile">+ New File</button>
+            <button id="opsQuickOpenSidebar">Toggle Files Sidebar</button>
+            <button id="opsQuickGenerateCodename">Generate Codename</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+/* ===========================
+   ACCESS LEVELS & LOGIN SYSTEM
+=========================== */
+let isGuest = false;
+let isAdmin = false;
+
+const loginScreen = document.getElementById("lockwoodLogin");
+const loginUser   = document.getElementById("loginUser");
+const loginPass   = document.getElementById("loginPass");
+const loginBtn    = document.getElementById("loginBtn");
+const guestBtn    = document.getElementById("guestBtn");
+
+const opsCenterBtn     = document.getElementById("opsCenterBtn");
+const opsCenter        = document.getElementById("opsCenter");
+const opsFadeOverlay   = document.getElementById("opsFadeOverlay");
+const closeOpsCenterBtn = document.getElementById("closeOpsCenterBtn");
+
+function hideLoginSuccess() {
+  loginScreen.classList.add("login-success");
+  setTimeout(() => {
+    loginScreen.style.display = "none";
+  }, 800);
+}
+
+function lockGuestFeatures() {
+  // Disable add buttons
+  const addCharacterBtn = document.getElementById("addCharacterBtn");
+  const addFileBtn      = document.getElementById("addFileBtn");
+  if (addCharacterBtn) {
+    addCharacterBtn.disabled = true;
+    addCharacterBtn.style.opacity = "0.4";
+  }
+  if (addFileBtn) {
+    addFileBtn.disabled = true;
+    addFileBtn.style.opacity = "0.4";
+  }
+
+  // Disable delete buttons
+  document.querySelectorAll(".revoke-btn").forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+  });
+
+  // Disable edit buttons
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+  });
+
+  // OPS CENTER locked for guests
+  if (opsCenterBtn) {
+    opsCenterBtn.disabled = true;
+    opsCenterBtn.classList.remove("ops-enabled");
+    opsCenterBtn.classList.add("ops-disabled");
+    opsCenterBtn.title = "Admin clearance required";
+  }
+}
+
+guestBtn.onclick = () => {
+  isGuest = true;
+  isAdmin = false;
+  hideLoginSuccess();
+  lockGuestFeatures();
+};
+
+loginBtn.onclick = () => {
+  const user = (loginUser.value || "").trim();
+  const pass = (loginPass.value || "").trim();
+
+  if (user === "SawyerT" && pass === "0617") {
+    isAdmin = true;
+    isGuest = false;
+    hideLoginSuccess();
+
+    // Enable OPS CENTER
+    if (opsCenterBtn) {
+      opsCenterBtn.disabled = false;
+      opsCenterBtn.classList.remove("ops-disabled");
+      opsCenterBtn.classList.add("ops-enabled");
+      opsCenterBtn.title = "Open Lockwood Operations Center";
+    }
+  } else {
+    loginScreen.classList.add("login-fail");
+    setTimeout(() => loginScreen.classList.remove("login-fail"), 600);
+  }
+};
+
+/* ===========================
+   THEME SWITCHER
+=========================== */
+const themeSelector = document.getElementById("themeSelector");
+themeSelector.addEventListener("change", () => {
+  const theme = themeSelector.value || "dark";
+  const sidebarState = document.body.classList.contains("sidebar-expanded")
+    ? "sidebar-expanded"
+    : "sidebar-collapsed";
+  document.body.className = theme + " " + sidebarState;
+});
+
+/* ===========================
+   LIGHTBOX
+=========================== */
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").style.display = "flex";
+}
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+}
+
+/* ===========================
+   MISSION VIEWER
+=========================== */
+function openMissionViewer(title, img, notes = "") {
+  document.getElementById("missionTitle").textContent = title;
+  document.getElementById("missionImage").src = img;
+  document.getElementById("missionNotes").textContent = notes;
+  document.getElementById("missionViewer").classList.add("open");
+}
+function closeMissionViewer() {
+  document.getElementById("missionViewer").classList.remove("open");
+}
+
+/* ===========================
+   DELETE CARD
+=========================== */
+function revokeCard(button) {
+  if (isGuest) return; // guests cannot delete
+  const card = button.closest(".card, .file-card");
+  if (card) {
+    card.classList.add("card-removing");
+    setTimeout(() => {
+      card.remove();
+      saveState();
+    }, 200);
+  }
+}
+
+/* ===========================
+   POPUP REFERENCES
+=========================== */
+const popupCharacter     = document.getElementById("popupCharacter");
+const popupFile          = document.getElementById("popupFile");
+const editCharacterPopup = document.getElementById("editCharacterPopup");
+
+const addCharacterBtn = document.getElementById("addCharacterBtn");
+const cancelCharBtn   = document.getElementById("cancelCharBtn");
+const submitCharBtn   = document.getElementById("submitCharBtn");
+
+const addFileBtn    = document.getElementById("addFileBtn");
+const cancelFileBtn = document.getElementById("cancelFileBtn");
+const submitFileBtn = document.getElementById("submitFileBtn");
+
+const cancelEditCharBtn = document.getElementById("cancelEditCharBtn");
+const saveEditCharBtn   = document.getElementById("saveEditCharBtn");
+
+/* ===========================
+   CHARACTER POPUP
+=========================== */
+addCharacterBtn.onclick = () => {
+  if (isGuest) return; // guest cannot add
+  popupCharacter.style.display = "block";
+};
+cancelCharBtn.onclick = () => {
+  popupCharacter.style.display = "none";
+};
+
+/* ===========================
+   FILE POPUP
+=========================== */
+addFileBtn.onclick = () => {
+  if (isGuest) return; // guest cannot add
+  popupFile.style.display = "block";
+};
+cancelFileBtn.onclick = () => {
+  popupFile.style.display = "none";
+};
+
+/* ===========================
+   CLOSE EDIT POPUP
+=========================== */
+cancelEditCharBtn.onclick = () => {
+  editCharacterPopup.style.display = "none";
+};
+
+/* ===========================
+   DRAG & DROP IMAGE SUPPORT
+=========================== */
+document.addEventListener("dragover", e => e.preventDefault());
+document.addEventListener("drop", e => {
+  e.preventDefault();
+  if (isGuest) return; // guests cannot create via drag-and-drop
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith("image/")) return;
+
+  const reader = new FileReader();
+  reader.onload = ev => createCharacterFromImage(ev.target.result);
+  reader.readAsDataURL(file);
+});
+
+/* ===========================
+   CREATE CHARACTER FROM IMAGE
+=========================== */
+function createCharacterFromImage(imageData, name = "New Character", alias = "Alias: Unknown", role = "Role: Undefined", notes = "Notes...") {
+  const card = document.createElement("div");
+  card.className = "card character-card enter-card";
+  card.innerHTML = `
+    <img src="${imageData}" alt="${name}" onclick="openLightbox(this.src)">
+    <div class="name">${name}</div>
+    <div class="alias">${alias}</div>
+    <div class="role">${role}</div>
+    <textarea>${notes}</textarea>
+    <div class="card-actions">
+      <button class="edit-btn" onclick="editCharacter(this)">Edit</button>
+      <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+    </div>
+  `;
+
+  document.getElementById("characterGrid").appendChild(card);
+  setTimeout(() => card.classList.remove("enter-card"), 300);
+  saveState();
+  if (isGuest) lockGuestFeatures();
+}
+
+/* ===========================
+   SAVE STATE
+=========================== */
+function saveState() {
+  const characters = [];
+  const files = [];
+
+  document.querySelectorAll("#characterGrid .card").forEach(card => {
+    characters.push({
+      img:   card.querySelector("img")?.src || "",
+      name:  card.querySelector(".name")?.textContent || "",
+      alias: card.querySelector(".alias")?.textContent || "",
+      role:  card.querySelector(".role")?.textContent || "",
+      notes: card.querySelector("textarea")?.value || ""
+    });
+  });
+
+  document.querySelectorAll("#fileList .file-card").forEach(fc => {
+    files.push({
+      img:   fc.querySelector("img")?.src || "",
+      title: fc.querySelector(".file-title")?.textContent || "",
+      notes: fc.getAttribute("data-notes") || ""
+    });
+  });
+
+  localStorage.setItem("lockwood_terminal_save", JSON.stringify({ characters, files }));
+}
+
+/* ===========================
+   LOAD STATE
+=========================== */
+function loadState() {
+  const raw = localStorage.getItem("lockwood_terminal_save");
+  if (!raw) return;
+
+  let state;
+  try { state = JSON.parse(raw); } catch { return; }
+
+  const grid = document.getElementById("characterGrid");
+  const fileList = document.getElementById("fileList");
+
+  (state.characters || []).forEach(c => {
+    const card = document.createElement("div");
+    card.className = "card character-card enter-card";
+    card.innerHTML = `
+      <img src="${c.img}" alt="${c.name}" onclick="openLightbox(this.src)">
+      <div class="name">${c.name}</div>
+      <div class="alias">${c.alias}</div>
+      <div class="role">${c.role}</div>
+      <textarea>${c.notes || ""}</textarea>
+      <div class="card-actions">
+        <button class="edit-btn" onclick="editCharacter(this)">Edit</button>
+        <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+      </div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.remove("enter-card"), 300);
+  });
+
+  fileList.innerHTML = "";
+  (state.files || []).forEach(f => {
+    const safeTitle = (f.title || "").replace(/'/g, "\\'");
+    const safeImg   = (f.img   || "").replace(/'/g, "\\'");
+    const safeNotes = (f.notes || "").replace(/'/g, "\\'");
+
+    const fc = document.createElement("div");
+    fc.className = "file-card enter-card";
+    fc.setAttribute("data-notes", f.notes || "");
+    fc.innerHTML = `
+      <img src="${f.img}" alt="${f.title}"
+           onclick="openMissionViewer('${safeTitle}','${safeImg}','${safeNotes}')">
+      <div class="file-title">${f.title}</div>
+      <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+    `;
+    fileList.appendChild(fc);
+    setTimeout(() => fc.classList.remove("enter-card"), 300);
+  });
+
+  if (isGuest) lockGuestFeatures();
+}
+
+/* ===========================
+   SUBMIT CHARACTER
+=========================== */
+submitCharBtn.onclick = () => {
+  if (isGuest) return; // guests cannot submit
+  const name    = document.getElementById("charName").value  || "New Character";
+  const alias   = document.getElementById("charAlias").value || "(alias)";
+  const role    = document.getElementById("charRole").value  || "Role";
+  const imgPath = document.getElementById("charImage").value;
+  const notes   = document.getElementById("charNotes").value || "";
+  const upload  = document.getElementById("charUpload").files[0];
+
+  if (upload) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      createCharacterFromImage(ev.target.result, name, "Alias: " + alias, "Role: " + role, notes);
+      popupCharacter.style.display = "none";
+    };
+    reader.readAsDataURL(upload);
+    return;
+  }
+
+  const grid = document.getElementById("characterGrid");
+  const card = document.createElement("div");
+  card.className = "card character-card enter-card";
+  card.innerHTML = `
+    <img src="${imgPath}" alt="${name}" onclick="openLightbox(this.src)">
+    <div class="name">${name}</div>
+    <div class="alias">Alias: ${alias}</div>
+    <div class="role">Role: ${role}</div>
+    <textarea>${notes}</textarea>
+    <div class="card-actions">
+      <button class="edit-btn" onclick="editCharacter(this)">Edit</button>
+      <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+    </div>
+  `;
+  grid.appendChild(card);
+  setTimeout(() => card.classList.remove("enter-card"), 300);
+
+  popupCharacter.style.display = "none";
+  saveState();
+};
+
+/* ===========================
+   SUBMIT FILE
+=========================== */
+submitFileBtn.onclick = () => {
+  if (isGuest) return; // guests cannot submit
+  const title   = document.getElementById("fileTitle").value || "New File";
+  const imgPath = document.getElementById("fileImage").value;
+  const upload  = document.getElementById("fileUpload").files[0];
+  const notes   = document.getElementById("fileNotes").value || "";
+
+  if (upload) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      createFileFromImage(ev.target.result, title, notes);
+      popupFile.style.display = "none";
+    };
+    reader.readAsDataURL(upload);
+    return;
+  }
+
+  createFileFromImage(imgPath, title, notes);
+  popupFile.style.display = "none";
+};
+
+/* ===========================
+   CREATE FILE CARD
+=========================== */
+function createFileFromImage(src, title, notes = "") {
+  const fileList = document.getElementById("fileList");
+
+  const safeTitle = (title || "").replace(/'/g, "\\'");
+  const safeSrc   = (src   || "").replace(/'/g, "\\'");
+  const safeNotes = (notes || "").replace(/'/g, "\\'");
+
+  const fc = document.createElement("div");
+  fc.className = "file-card enter-card";
+  fc.setAttribute("data-notes", notes);
+  fc.innerHTML = `
+    <img src="${src}" alt="${title}"
+         onclick="openMissionViewer('${safeTitle}','${safeSrc}','${safeNotes}')">
+    <div class="file-title">${title}</div>
+    <button class="revoke-btn" onclick="revokeCard(this)">Revoke Access</button>
+  `;
+
+  fileList.appendChild(fc);
+  setTimeout(() => fc.classList.remove("enter-card"), 300);
+  saveState();
+  if (isGuest) lockGuestFeatures();
+}
+
+/* ===========================
+   EDIT CHARACTER FEATURE
+=========================== */
+let currentEditingCard = null;
+
+function editCharacter(button) {
+  if (isGuest) return; // guests cannot edit
+  const card = button.closest(".card");
+  if (!card) return;
+
+  currentEditingCard = card;
+
+  document.getElementById("editCharName").value  = card.querySelector(".name").textContent;
+  document.getElementById("editCharAlias").value = card.querySelector(".alias").textContent.replace("Alias: ", "");
+  document.getElementById("editCharRole").value  = card.querySelector(".role").textContent.replace("Role: ", "");
+  document.getElementById("editCharImage").value = card.querySelector("img").src;
+  document.getElementById("editCharNotes").value = card.querySelector("textarea").value;
+
+  editCharacterPopup.style.display = "block";
+}
+
+saveEditCharBtn.onclick = () => {
+  if (!currentEditingCard || isGuest) return;
+
+  const name  = document.getElementById("editCharName").value;
+  const alias = document.getElementById("editCharAlias").value;
+  const role  = document.getElementById("editCharRole").value;
+  const img   = document.getElementById("editCharImage").value;
+  const notes = document.getElementById("editCharNotes").value;
+
+  currentEditingCard.querySelector(".name").textContent = name;
+  currentEditingCard.querySelector(".alias").textContent = "Alias: " + alias;
+  currentEditingCard.querySelector(".role").textContent = "Role: " + role;
+  currentEditingCard.querySelector("img").src = img;
+  currentEditingCard.querySelector("textarea").value = notes;
+
+  editCharacterPopup.style.display = "none";
+  saveState();
+};
+
+/* ===========================
+   SIDEBAR TOGGLE
+=========================== */
+const sidebarToggle = document.getElementById("sidebarToggle");
+sidebarToggle.onclick = () => {
+  document.body.classList.toggle("sidebar-expanded");
+  document.body.classList.toggle("sidebar-collapsed");
+};
+
+/* ===========================
+   SPY MUSIC SYSTEM
+=========================== */
+const spyMusic    = document.getElementById("spyMusic");
+const musicToggle = document.getElementById("musicToggle");
+const musicVolume = document.getElementById("musicVolume");
+
+spyMusic.volume = 0.4;
+spyMusic.play().catch(() => { /* ignore autoplay errors */ });
+
+musicToggle.onclick = () => {
+  if (spyMusic.paused) {
+    spyMusic.play().catch(() => {});
+    musicToggle.textContent = "🔊 Music";
+  } else {
+    spyMusic.pause();
+    musicToggle.textContent = "🔇 Muted";
+  }
+};
+
+musicVolume.oninput = () => {
+  spyMusic.volume = musicVolume.value;
+};
+
+/* ===========================
+   INTEL TICKER
+=========================== */
+const intelMessages = [
+  "Scanning encrypted channels...",
+  "Intercepting radio chatter...",
+  "Decrypting mission files...",
+  "Monitoring Lockwood perimeter sensors...",
+  "Analyzing student activity logs...",
+  "Tracking unauthorized access attempts...",
+  "Updating agent dossiers..."
+];
+
+let intelIndex = 0;
+
+setInterval(() => {
+  document.getElementById("intelText").textContent = intelMessages[intelIndex];
+  intelIndex = (intelIndex + 1) % intelMessages.length;
+}, 4000);
+
+/* ===========================
+   OPS CENTER LOGIC
+=========================== */
+const opsNotes            = document.getElementById("opsNotes");
+const opsNotesTimestamp   = document.getElementById("opsNotesTimestamp");
+const opsSecureToggle     = document.getElementById("opsSecureToggle");
+const opsCopyNotesBtn     = document.getElementById("opsCopyNotesBtn");
+const opsNotesTabs        = document.querySelectorAll(".ops-notes-tab");
+const opsIntelFeed        = document.getElementById("opsIntelFeed");
+const opsMissionSnapshot  = document.getElementById("opsMissionSnapshot");
+const opsBriefingText     = document.getElementById("opsBriefingText");
+
+let currentNotesTab = "general";
+let opsNotesDirty   = false;
+
+// Open / Close OPS CENTER with fade
+function openOpsCenter() {
+  if (!isAdmin) return;
+  opsFadeOverlay.classList.add("visible");
+  setTimeout(() => {
+    opsCenter.classList.add("visible");
+  }, 180);
+}
+
+function closeOpsCenter() {
+  opsCenter.classList.remove("visible");
+  setTimeout(() => {
+    opsFadeOverlay.classList.remove("visible");
+  }, 220);
+}
+
+if (opsCenterBtn) {
+  opsCenterBtn.addEventListener("click", () => {
+    if (!isAdmin) return;
+    openOpsCenter();
+  });
+}
+
+if (closeOpsCenterBtn) {
+  closeOpsCenterBtn.addEventListener("click", () => {
+    closeOpsCenter();
+  });
+}
+
+// Notes: load/save per tab
+function getNotesKey(tab) {
+  return "lockwood_ops_notes_" + tab;
+}
+
+function getNotesTimeKey(tab) {
+  return "lockwood_ops_notes_time_" + tab;
+}
+
+function loadOpsNotes(tab) {
+  const key = getNotesKey(tab);
+  const timeKey = getNotesTimeKey(tab);
+  const saved = localStorage.getItem(key) || "";
+  const savedTime = localStorage.getItem(timeKey) || "—";
+  opsNotes.value = saved;
+  opsNotesTimestamp.textContent = savedTime;
+  opsNotesDirty = false;
+}
+
+function saveOpsNotes(tab) {
+  const key = getNotesKey(tab);
+  const timeKey = getNotesTimeKey(tab);
+  const content = opsNotes.value || "";
+  localStorage.setItem(key, content);
+  const now = new Date();
+  const stamp = now.toLocaleString();
+  localStorage.setItem(timeKey, stamp);
+  opsNotesTimestamp.textContent = stamp;
+  opsNotesDirty = false;
+}
+
+opsNotes.addEventListener("input", () => {
+  opsNotesDirty = true;
+});
+
+setInterval(() => {
+  if (opsNotesDirty) {
+    saveOpsNotes(currentNotesTab);
+  }
+}, 2000);
+
+opsNotesTabs.forEach(tabBtn => {
+  tabBtn.addEventListener("click", () => {
+    const tab = tabBtn.getAttribute("data-tab");
+    if (tab === currentNotesTab) return;
+
+    opsNotesTabs.forEach(b => b.classList.remove("active"));
+    tabBtn.classList.add("active");
+    currentNotesTab = tab;
+    loadOpsNotes(currentNotesTab);
+  });
+});
+
+// Secure mode blur
+opsSecureToggle.addEventListener("change", () => {
+  if (opsSecureToggle.checked) {
+    opsNotes.classList.add("secure-blur");
+  } else {
+    opsNotes.classList.remove("secure-blur");
+  }
+});
+
+// Copy notes
+opsCopyNotesBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(opsNotes.value || "");
+  } catch (e) {
+    // ignore
+  }
+});
+
+// Initialize notes on first load
+loadOpsNotes(currentNotesTab);
+
+// OPS CENTER: Intel feed (uses same style as ticker but expanded)
+const opsIntelMessages = [
+  "LOCKWOOD OPS: Monitoring academy entry points...",
+  "LOCKWOOD OPS: Syncing student dossiers with central archive...",
+  "LOCKWOOD OPS: Cross-referencing mission files with timetable data...",
+  "LOCKWOOD OPS: Verifying encryption keys on all terminals...",
+  "LOCKWOOD OPS: Scanning for unauthorized transmissions...",
+  "LOCKWOOD OPS: Updating operations schedule..."
+];
+
+let opsIntelPointer = 0;
+
+function pushIntelMessage(msg) {
+  const li = document.createElement("li");
+  li.textContent = msg;
+  opsIntelFeed.prepend(li);
+  // limit feed length
+  const items = opsIntelFeed.querySelectorAll("li");
+  if (items.length > 8) {
+    items[items.length - 1].remove();
+  }
+}
+
+setInterval(() => {
+  pushIntelMessage(opsIntelMessages[opsIntelPointer]);
+  opsIntelPointer = (opsIntelPointer + 1) % opsIntelMessages.length;
+}, 5000);
+
+// OPS CENTER: Briefing auto-rotation
+const briefingSnippets = [
+  "Academy operating at normal security levels. No perimeter breaches detected in the last 24 hours.",
+  "Training simulations scheduled for advanced operatives at 1600 hours. Attendance is mandatory.",
+  "New mission files have been added to the archive. Review all high-priority tags before next class.",
+  "Surveillance notes indicate increased activity near the main gate. Maintain heightened awareness.",
+  "Codename generator has been updated with new call signs. Ensure all agents are assigned a codename."
+];
+
+let briefingIndex = 0;
+function rotateBriefing() {
+  opsBriefingText.textContent = briefingSnippets[briefingIndex];
+  briefingIndex = (briefingIndex + 1) % briefingSnippets.length;
+}
+rotateBriefing();
+setInterval(rotateBriefing, 12000);
+
+// OPS CENTER: Mission snapshot from current file cards
+function refreshMissionSnapshot() {
+  opsMissionSnapshot.innerHTML = "";
+  const fileCards = document.querySelectorAll("#fileList .file-card");
+  fileCards.forEach(card => {
+    const title = card.querySelector(".file-title")?.textContent || "Untitled File";
+    const notes = card.getAttribute("data-notes") || "";
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div class="mission-title">${title}</div>
+      <div class="mission-notes">${notes || "No mission notes available."}</div>
+    `;
+    opsMissionSnapshot.appendChild(li);
+  });
+}
+
+// OPS quick actions
+const opsQuickAddCharacter   = document.getElementById("opsQuickAddCharacter");
+const opsQuickAddFile        = document.getElementById("opsQuickAddFile");
+const opsQuickOpenSidebar    = document.getElementById("opsQuickOpenSidebar");
+const opsQuickGenerateCodename = document.getElementById("opsQuickGenerateCodename");
+const searchCharactersInput  = document.getElementById("searchCharacters");
+const codenameOutput         = document.getElementById("codenameOutput");
+const generateCodenameBtn    = document.getElementById("generateCodenameBtn");
+
+opsQuickAddCharacter.addEventListener("click", () => {
+  if (isGuest) return;
+  popupCharacter.style.display = "block";
+  closeOpsCenter();
+});
+
+opsQuickAddFile.addEventListener("click", () => {
+  if (isGuest) return;
+  popupFile.style.display = "block";
+  closeOpsCenter();
+});
+
+opsQuickOpenSidebar.addEventListener("click", () => {
+  sidebarToggle.click();
+});
+
+opsQuickGenerateCodename.addEventListener("click", () => {
+  generateCodenameBtn?.click();
+});
+
+// Simple codename generator (if not already wired elsewhere)
+if (generateCodenameBtn) {
+  const codenamePartsA = ["Shadow", "Crimson", "Silver", "Night", "Ghost", "Cipher", "Quantum"];
+  const codenamePartsB = ["Fox", "Raven", "Viper", "Falcon", "Specter", "Nova", "Echo"];
+
+  generateCodenameBtn.addEventListener("click", () => {
+    const a = codenamePartsA[Math.floor(Math.random() * codenamePartsA.length)];
+    const b = codenamePartsB[Math.floor(Math.random() * codenamePartsB.length)];
+    codenameOutput.value = a + " " + b;
+  });
+}
+
+/* ===========================
+   INITIAL LOAD
+=========================== */
+loadState();
+refreshMissionSnapshot();
+</script>
+
+</body>
+</html>
